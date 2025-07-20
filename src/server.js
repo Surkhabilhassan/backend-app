@@ -14,11 +14,14 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
-// CORS settings
+// CORS settings (allow local + netlify frontend)
 app.use(
   cors({
-    origin: "http://localhost:5173", // Change this when deploying frontend
-    credentials: true, // allow frontend to send cookies
+    origin: [
+      "http://localhost:5173",
+      "https://chatapp-surkhabil.netlify.app"
+    ],
+    credentials: true,
   })
 );
 
@@ -30,12 +33,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 
-// Root route (health message)
+// Root route
 app.get("/", (req, res) => {
   res.send("Backend is running successfully!");
 });
 
-// Extra Health Route (checks server and DB)
+// Health check route
 app.get("/health", (req, res) => {
   res.json({
     status: "OK",
