@@ -11,13 +11,13 @@ import chatRoutes from "./routes/chat.route.js";
 import { connectDB } from "./lib/db.js";
 
 const app = express();
-const PORT = process.env.PORT;
-
+const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
+// CORS settings
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "http://localhost:5173", // Change this when deploying frontend
     credentials: true, // allow frontend to send cookies
   })
 );
@@ -25,10 +25,27 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
 
+// Root route (health message)
+app.get("/", (req, res) => {
+  res.send("Backend is running successfully!");
+});
+
+// Extra Health Route (checks server and DB)
+app.get("/health", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "Server is healthy",
+    environment: process.env.NODE_ENV,
+    uptime: process.uptime(),
+  });
+});
+
+// Serve frontend in production
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
